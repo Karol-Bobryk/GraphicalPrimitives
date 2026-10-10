@@ -6,7 +6,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QWidget>
+#include "customgraphicsview.h"
 #include "linedrawhub.h"
+#include <vector>
 
 class QPushButton;
 class Window : public QWidget
@@ -16,12 +18,19 @@ public:
     explicit Window(QWidget *parent = nullptr);
 private:
     QGraphicsScene *main_scene;
-    QGraphicsView *main_view;
+    CustomGraphicsView *main_view;
     LineDrawHub *draw_hub;
+
 signals:
 
 private slots:
     void drawLine(QPointF a, QPointF b);
+    void registerCanvasClick(QPointF point);
+
+private:
+    enum class ShapeDrawMode { Line, Triangle, Rectangle, Circle };
+    std::vector<QPointF> clickedPoints;
+    ShapeDrawMode shapeMode;
 };
 
 #endif // WINDOW_H

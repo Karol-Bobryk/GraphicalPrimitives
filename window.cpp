@@ -20,7 +20,7 @@ Window::Window(QWidget *parent)
     this->setFixedSize(600, 500);
 
     main_view->move(0, 200.0);
-    draw_hub->move(0, 100.0);
+    draw_hub->move(0, 50.0);
 
     draw_hub->addWidget(new LineDrawHub(this));
 
@@ -50,19 +50,20 @@ void Window::drawRectangle(QPointF a, QPointF b)
     main_scene->update();
 }
 
-void Window::drawCircle(QPointF a, QPointF b)
+void Window::drawCircle(QPointF center, QPointF radiusPoint)
 {
-    main_scene->addEllipse(QRectF(a, b), currentPen);
+    qreal radius = QLineF(center, radiusPoint).length();
+
+    QPointF topRight(center.x() - radius, center.y() - radius);
+    QPointF bottomLeft(center.x() + radius, center.y() + radius);
+
+    main_scene->addEllipse(QRectF(topRight, bottomLeft), currentPen);
     main_scene->update();
 }
 
 void Window::registerCanvasClick(QPointF point)
 {
     clicked_points.push_back(point);
-    qInfo() << clicked_points.size();
-    for (auto *e : main_scene->items()) {
-        // qInfo() <<  ;
-    }
     switch (shape_mode) {
     case ShapeDrawMode::Line:
         if (clicked_points.size() == 2) {

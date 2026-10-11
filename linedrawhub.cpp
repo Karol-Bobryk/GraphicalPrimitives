@@ -7,7 +7,6 @@ LineDrawHub::LineDrawHub(QWidget *parent)
     : QWidget{parent}
     , xPosEdits{new QLineEdit(), new QLineEdit()}
     , yPosEdits{new QLineEdit(), new QLineEdit()}
-
     , draw_button{new QPushButton("Draw")}
 {
     // makes sure edits validate their inputs

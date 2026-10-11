@@ -7,9 +7,9 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QStackedWidget>
+#include <QVBoxLayout>
 #include <QWidget>
 #include "customgraphicsview.h"
-#include "linedrawhub.h"
 #include <vector>
 
 class QPushButton;
@@ -22,7 +22,6 @@ private:
     QVBoxLayout *workbar;
     QGraphicsScene *main_scene;
     CustomGraphicsView *main_view;
-    LineDrawHub *line_draw_hub;
     QComboBox *shape_mode_picker;
     QStackedWidget *draw_hub;
     QPen currentPen;
@@ -32,6 +31,8 @@ private slots:
     void drawLine(QPointF a, QPointF b);
     void drawRectangle(QPointF a, QPointF b);
     void drawCircle(QPointF a, QPointF b);
+    void drawFromHub(QPointF a, QPointF b);
+    void drawCurrentShape();
     void registerCanvasClick(QPointF point);
     void switchDrawingHub(const QString &text);
 

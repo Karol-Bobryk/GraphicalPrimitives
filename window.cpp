@@ -22,7 +22,8 @@ Window::Window(QWidget *parent)
     main_view->move(0, 200.0);
     draw_hub->move(0, 50.0);
 
-    draw_hub->addWidget(new LineDrawHub(this));
+    auto line_draw_hub = new LineDrawHub(this);
+    draw_hub->addWidget(line_draw_hub);
 
     // If canvas detects click
     connect(main_view,
@@ -33,8 +34,10 @@ Window::Window(QWidget *parent)
     // If picker detects change
     connect(shape_mode_picker, &QComboBox::currentTextChanged, this, &Window::switchDrawingHub);
 
-    // connect(line_draw_hub, &LineDrawHub::clickedDrawLine, this, &Window::drawLine);
+    // i do not care enough to change this name, every shape is made from 2 points anyway
+    connect(line_draw_hub, &LineDrawHub::clickedDrawLine, this, &Window::drawFromHub);
 }
+
 void Window::drawLine(QPointF a, QPointF b)
 {
     main_scene->addLine(QLineF(a, b), currentPen);
@@ -42,10 +45,6 @@ void Window::drawLine(QPointF a, QPointF b)
 
 void Window::drawRectangle(QPointF a, QPointF b)
 {
-    qInfo() << "drawing rect...";
-
-    qInfo() << "a: " << a.x() << " " << a.y();
-    qInfo() << "b: " << b.x() << " " << b.y();
     main_scene->addRect(QRectF(a, b), currentPen);
     main_scene->update();
 }
@@ -61,9 +60,8 @@ void Window::drawCircle(QPointF center, QPointF radiusPoint)
     main_scene->update();
 }
 
-void Window::registerCanvasClick(QPointF point)
+void Window::drawCurrentShape()
 {
-    clicked_points.push_back(point);
     switch (shape_mode) {
     case ShapeDrawMode::Line:
         if (clicked_points.size() == 2) {
@@ -84,6 +82,20 @@ void Window::registerCanvasClick(QPointF point)
         }
         break;
     }
+}
+
+void Window::registerCanvasClick(QPointF point)
+{
+    clicked_points.push_back(point);
+    drawCurrentShape();
+}
+
+void Window::drawFromHub(QPointF a, QPointF b)
+{
+    clicked_points.clear();
+    clicked_points.push_back(a);
+    clicked_points.push_back(b);
+    drawCurrentShape();
 }
 
 void Window::switchDrawingHub(const QString &text)

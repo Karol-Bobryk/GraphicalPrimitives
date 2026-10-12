@@ -1,22 +1,25 @@
 #include "window.h"
+#include <QLine>
 #include <QRectF>
 #include "linedrawhub.h"
 
 Window::Window(QWidget *parent)
     : QWidget{parent}
-    , currentPen{QPen(QColor(144, 137, 16))}
+    , currentPen{QPen(QColor(135, 221, 246))}
     , main_scene{new QGraphicsScene(QRectF(0, 0, 500.0, 300.0), this)}
-    , main_view{new CustomGraphicsView(main_scene, this)} // , draw_hub{new LineDrawHub(this)}
+    , main_view{new CustomGraphicsView(main_scene, this)}
     , draw_hub{new QStackedWidget(this)}
     , shape_mode{ShapeDrawMode::Line}
     , shape_mode_picker{new QComboBox(this)}
 {
+    currentPen.setWidth(5);
+
     shape_mode_picker->addItem("Line");
     shape_mode_picker->addItem("Rectangle");
     shape_mode_picker->addItem("Circle");
+    shape_mode_picker->addItem("Drag");
 
     // compose workbar
-
     this->setFixedSize(600, 500);
 
     main_view->move(0, 200.0);
@@ -81,11 +84,16 @@ void Window::drawCurrentShape()
             clicked_points.clear();
         }
         break;
+    case ShapeDrawMode::Off:
+        return;
     }
 }
 
 void Window::registerCanvasClick(QPointF point)
 {
+    if (shape_mode == ShapeDrawMode::Off)
+        return;
+
     clicked_points.push_back(point);
     drawCurrentShape();
 }
@@ -100,12 +108,15 @@ void Window::drawFromHub(QPointF a, QPointF b)
 
 void Window::switchDrawingHub(const QString &text)
 {
+    qInfo() << text;
     if (text == "Line")
         shape_mode = ShapeDrawMode::Line;
-    if (text == "Rectangle")
+    else if (text == "Rectangle")
         shape_mode = ShapeDrawMode::Rectangle;
-    if (text == "Circle")
+    else if (text == "Circle")
         shape_mode = ShapeDrawMode::Circle;
+    else
+        shape_mode = ShapeDrawMode::Off;
 
     clicked_points.clear();
 }

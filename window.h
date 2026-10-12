@@ -37,7 +37,7 @@ private slots:
     void switchDrawingHub(const QString &text);
 
 private:
-    enum class ShapeDrawMode { Line, Rectangle, Circle };
+    enum class ShapeDrawMode { Line, Rectangle, Circle, Off };
     std::vector<QPointF> clicked_points;
     ShapeDrawMode shape_mode;
 };

@@ -5,14 +5,15 @@
 
 Window::Window(QWidget *parent)
     : QWidget{parent}
-    , currentPen{QPen(QColor(135, 221, 246))}
+    , current_pen{QPen(QColor(135, 221, 246))}
     , main_scene{new QGraphicsScene(QRectF(0, 0, 500.0, 300.0), this)}
     , main_view{new CustomGraphicsView(main_scene, this)}
     , draw_hub{new QStackedWidget(this)}
     , shape_mode{ShapeDrawMode::Line}
     , shape_mode_picker{new QComboBox(this)}
+    , serialization_hub(new SerializationHub(this))
 {
-    currentPen.setWidth(5);
+    current_pen.setWidth(5);
 
     shape_mode_picker->addItem("Line");
     shape_mode_picker->addItem("Rectangle");
@@ -22,8 +23,11 @@ Window::Window(QWidget *parent)
     // compose workbar
     this->setFixedSize(600, 500);
 
+    shape_mode_picker->move(10, 10);
     main_view->move(0, 200.0);
     draw_hub->move(0, 50.0);
+
+    serialization_hub->move(200.0, 0);
 
     auto line_draw_hub = new LineDrawHub(this);
     draw_hub->addWidget(line_draw_hub);
@@ -39,16 +43,27 @@ Window::Window(QWidget *parent)
 
     // i do not care enough to change this name, every shape is made from 2 points anyway
     connect(line_draw_hub, &LineDrawHub::clickedDrawLine, this, &Window::drawFromHub);
+
+    // If save clicked
+    connect(serialization_hub,
+            &SerializationHub::saveLayoutRequested,
+            main_view,
+            &CustomGraphicsView::saveToJSONFile);
+
+    connect(serialization_hub,
+            &SerializationHub::loadLayoutRequested,
+            main_view,
+            &CustomGraphicsView::loadFromJSONFile);
 }
 
 void Window::drawLine(QPointF a, QPointF b)
 {
-    main_scene->addLine(QLineF(a, b), currentPen);
+    main_scene->addLine(QLineF(a, b), current_pen);
 }
 
 void Window::drawRectangle(QPointF a, QPointF b)
 {
-    main_scene->addRect(QRectF(a, b), currentPen);
+    main_scene->addRect(QRectF(a, b), current_pen);
     main_scene->update();
 }
 
@@ -59,7 +74,7 @@ void Window::drawCircle(QPointF center, QPointF radiusPoint)
     QPointF topRight(center.x() - radius, center.y() - radius);
     QPointF bottomLeft(center.x() + radius, center.y() + radius);
 
-    main_scene->addEllipse(QRectF(topRight, bottomLeft), currentPen);
+    main_scene->addEllipse(QRectF(topRight, bottomLeft), current_pen);
     main_scene->update();
 }
 

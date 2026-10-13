@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include "customgraphicsview.h"
+#include "serializationhub.h"
 #include <vector>
 
 class QPushButton;
@@ -19,12 +20,13 @@ class Window : public QWidget
 public:
     explicit Window(QWidget *parent = nullptr);
 private:
+    SerializationHub *serialization_hub;
     QVBoxLayout *workbar;
     QGraphicsScene *main_scene;
     CustomGraphicsView *main_view;
     QComboBox *shape_mode_picker;
     QStackedWidget *draw_hub;
-    QPen currentPen;
+    QPen current_pen;
 signals:
 
 private slots:

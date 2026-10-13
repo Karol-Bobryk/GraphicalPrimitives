@@ -34,6 +34,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         window.cpp
         linedrawhub.h linedrawhub.cpp
         customgraphicsview.h customgraphicsview.cpp
+        serializationhub.h serializationhub.cpp
+        util.h util.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET GraphicalPrimitives APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

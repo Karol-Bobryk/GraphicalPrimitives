@@ -151,8 +151,11 @@ QJsonObject CustomGraphicsView::serializeGraphicsItem(QGraphicsItem *item)
     {
         QGraphicsEllipseItem *ellipse = qgraphicsitem_cast<QGraphicsEllipseItem *>(item);
 
-        QPointF p1 = ellipse->rect().topLeft();
-        QPointF p2 = ellipse->rect().bottomRight();
+        QPointF p1 = ellipse->rect().center();
+        QPointF p2 = ellipse->rect().bottomLeft();
+        // circles are constructed via a nonstandard method so I had to convert it to be a point on the arc
+        QPointF leftUp = ellipse->rect().topLeft();
+        p2.setY(leftUp.y() + (p2.y() - leftUp.y()) / 2);
 
         QJsonArray points = Util::jsonArrayOfPoints({p1, p2});
 

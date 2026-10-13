@@ -4,6 +4,8 @@
 #include <QGraphicsItem>
 #include <QGraphicsView>
 #include <QJsonArray>
+#include <QList>
+#include <QPair>
 #include <QUrl>
 
 class CustomGraphicsView : public QGraphicsView
@@ -16,11 +18,13 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
 signals:
     void canvasClickRegistered(QPointF point);
+    void canvasDeserializedObjects(QList<QPair<QList<QPointF>, QString>> objects);
 
 private:
     QJsonArray serializeCanvas();
-    void deserializeCanvas();
+    void deserializeCanvas(QByteArray bytes);
     static QJsonObject serializeGraphicsItem(QGraphicsItem *item);
+    QPair<QList<QPointF>, QString> deserializeGraphicsItem(QJsonObject obj);
 
     QGraphicsItem *draggedItem = nullptr;
     QPointF itemOrigin;

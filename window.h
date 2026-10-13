@@ -5,6 +5,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 #include <QLineEdit>
+#include <QList>
+#include <QPair>
 #include <QPushButton>
 #include <QStackedWidget>
 #include <QVBoxLayout>
@@ -36,7 +38,8 @@ private slots:
     void drawFromHub(QPointF a, QPointF b);
     void drawCurrentShape();
     void registerCanvasClick(QPointF point);
-    void switchDrawingHub(const QString &text);
+    void switchDrawingHub(QString text);
+    void drawFromSaveFile(QList<QPair<QList<QPointF>, QString>> objects);
 
 private:
     enum class ShapeDrawMode { Line, Rectangle, Circle, Off };

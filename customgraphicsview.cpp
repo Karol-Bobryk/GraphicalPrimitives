@@ -59,10 +59,24 @@ void CustomGraphicsView::saveToJSONFile(QUrl file_url)
     QByteArray bytes = document.toJson();
     if (save_file.write(bytes) == -1)
         qInfo() << "failed to save layout";
+
     save_file.close();
 }
 
-void CustomGraphicsView::loadFromJSONFile(QUrl file_url) {}
+void CustomGraphicsView::loadFromJSONFile(QUrl file_url)
+{
+    QFile open_file(file_url.path());
+
+    if (!open_file.open(QIODeviceBase::ReadOnly)) {
+        qInfo() << "failed to open file for reading";
+        return;
+    }
+
+    QByteArray bytes = open_file.readAll();
+
+    scene()->clear();
+    deserializeCanvas(bytes);
+}
 
 QJsonArray CustomGraphicsView::serializeCanvas()
 {
@@ -76,8 +90,26 @@ QJsonArray CustomGraphicsView::serializeCanvas()
 
     return arr;
 }
+void CustomGraphicsView::deserializeCanvas(QByteArray bytes)
+{
+    QJsonDocument document = QJsonDocument::fromJson(bytes);
 
-void CustomGraphicsView::deserializeCanvas() {}
+    if (!document.isArray()) {
+        qInfo() << "json file does not contain an array";
+        return;
+    }
+
+    QJsonArray arr = document.array();
+    QList<QPair<QList<QPointF>, QString>> objects;
+
+    for (auto e : std::as_const(arr)) {
+        if (e.isObject()) {
+            objects.append(deserializeGraphicsItem(e.toObject()));
+        }
+    }
+
+    emit canvasDeserializedObjects(objects);
+}
 
 QJsonObject CustomGraphicsView::serializeGraphicsItem(QGraphicsItem *item)
 {
@@ -96,7 +128,7 @@ QJsonObject CustomGraphicsView::serializeGraphicsItem(QGraphicsItem *item)
 
         QJsonArray points = Util::jsonArrayOfPoints({p1, p2});
 
-        obj.insert("type", "LINE");
+        obj.insert("type", "Line");
         obj.insert("points", points);
 
         break;
@@ -110,7 +142,7 @@ QJsonObject CustomGraphicsView::serializeGraphicsItem(QGraphicsItem *item)
 
         QJsonArray points = Util::jsonArrayOfPoints({p1, p2});
 
-        obj.insert("type", "RECTANGLE");
+        obj.insert("type", "Rectangle");
         obj.insert("points", points);
 
         break;
@@ -124,7 +156,7 @@ QJsonObject CustomGraphicsView::serializeGraphicsItem(QGraphicsItem *item)
 
         QJsonArray points = Util::jsonArrayOfPoints({p1, p2});
 
-        obj.insert("type", "ELLIPSE");
+        obj.insert("type", "Circle");
         obj.insert("points", points);
 
         break;
@@ -133,4 +165,30 @@ QJsonObject CustomGraphicsView::serializeGraphicsItem(QGraphicsItem *item)
         qInfo() << "Unknown or unsupported shape type detected while saving";
     }
     return obj;
+}
+
+QPair<QList<QPointF>, QString> CustomGraphicsView::deserializeGraphicsItem(QJsonObject obj)
+{
+    QJsonValue type = obj.value("type");
+    if (!type.isString()) {
+        qInfo() << "property \"type\" has invalid type";
+    }
+
+    QJsonArray points = obj.value("points").toArray();
+    QList<QPointF> deserialized_points;
+
+    for (auto e : std::as_const(points)) {
+        if (!e.isObject()) {
+            qInfo() << "invalid point type";
+            continue;
+        }
+
+        QJsonValue json_x = e.toObject().value("x");
+        QJsonValue json_y = e.toObject().value("y");
+
+        if (json_x.isDouble() || json_y.isDouble())
+            deserialized_points.emplaceBack(json_x.toDouble(), json_y.toDouble());
+    }
+
+    return QPair<QList<QPointF>, QString>(deserialized_points, type.toString());
 }

@@ -54,6 +54,11 @@ Window::Window(QWidget *parent)
             &SerializationHub::loadLayoutRequested,
             main_view,
             &CustomGraphicsView::loadFromJSONFile);
+
+    connect(main_view,
+            &CustomGraphicsView::canvasDeserializedObjects,
+            this,
+            &Window::drawFromSaveFile);
 }
 
 void Window::drawLine(QPointF a, QPointF b)
@@ -121,7 +126,27 @@ void Window::drawFromHub(QPointF a, QPointF b)
     drawCurrentShape();
 }
 
-void Window::switchDrawingHub(const QString &text)
+void Window::drawFromSaveFile(QList<QPair<QList<QPointF>, QString>> objects)
+{
+    clicked_points.clear();
+    ShapeDrawMode current_mode = shape_mode;
+    for (const auto &pair : objects) {
+        QPointF p1 = pair.first[0];
+        QPointF p2 = pair.first[1];
+        QString shape = pair.second;
+
+        switchDrawingHub(shape);
+
+        clicked_points.push_back(p1);
+        clicked_points.push_back(p2);
+
+        drawCurrentShape();
+    }
+
+    shape_mode = current_mode;
+}
+
+void Window::switchDrawingHub(QString text)
 {
     qInfo() << text;
     if (text == "Line")

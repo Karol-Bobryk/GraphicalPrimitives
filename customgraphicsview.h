@@ -8,6 +8,9 @@
 #include <QPair>
 #include <QUrl>
 
+#define CUSTOM_DRAG
+#undef CUSTOM_DRAG
+
 class CustomGraphicsView : public QGraphicsView
 {
 public:
@@ -15,6 +18,7 @@ public:
 public:
     CustomGraphicsView(QGraphicsScene *scene, QWidget *parent = nullptr);
     void mouseReleaseEvent(QMouseEvent *event) override;
+
     void mousePressEvent(QMouseEvent *event) override;
 signals:
     void canvasClickRegistered(QPointF point);
@@ -26,7 +30,10 @@ private:
     static QJsonObject serializeGraphicsItem(QGraphicsItem *item);
     QPair<QList<QPointF>, QString> deserializeGraphicsItem(QJsonObject obj);
 
+    void showItemAsResizable(QGraphicsItem *item);
+
     QGraphicsItem *draggedItem = nullptr;
+    QGraphicsItem *focusedItem = nullptr;
     QPointF itemOrigin;
 public slots:
     void saveToJSONFile(QUrl file_url);

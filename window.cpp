@@ -63,12 +63,14 @@ Window::Window(QWidget *parent)
 
 void Window::drawLine(QPointF a, QPointF b)
 {
-    main_scene->addLine(QLineF(a, b), current_pen);
+    main_scene->addLine(QLineF(a, b), current_pen)
+        ->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
 }
 
 void Window::drawRectangle(QPointF a, QPointF b)
 {
-    main_scene->addRect(QRectF(a, b), current_pen);
+    main_scene->addRect(QRectF(a, b), current_pen)
+        ->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
     main_scene->update();
 }
 
@@ -79,7 +81,8 @@ void Window::drawCircle(QPointF center, QPointF radiusPoint)
     QPointF topRight(center.x() - radius, center.y() - radius);
     QPointF bottomLeft(center.x() + radius, center.y() + radius);
 
-    main_scene->addEllipse(QRectF(topRight, bottomLeft), current_pen);
+    main_scene->addEllipse(QRectF(topRight, bottomLeft), current_pen)
+        ->setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
     main_scene->update();
 }
 

@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QPushButton>
+// TODO: add resizing
 
 int main(int argc, char *argv[])
 {
